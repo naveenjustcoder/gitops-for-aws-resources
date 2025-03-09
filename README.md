@@ -1,0 +1,1 @@
+# gitops-for-aws-resources

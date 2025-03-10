@@ -45,7 +45,7 @@ jobs:
       # Step 5: Backup current Terraform state
       - name: Backup Terraform State
         run: |
-          aws s3 cp s3://$TF_ST_BKT/$TF_ST_KEY terraform.tfstate.backup
+          aws s3 cp s3://$TF_ST_BKT/$TF_ST_KEY terraform_backup_state_file
         id: backup-state      
 
       # Step 6: Run Terraform Plan
@@ -65,7 +65,7 @@ jobs:
         run: |
           echo "Rolling back changes..."
               # Restore the previous state
-          aws s3 cp terraform.tfstate.backup s3://$TF_ST_BKT/$TF_ST_KEY
+          aws s3 cp terraform_backup_state_file s3://$TF_ST_BKT/$TF_ST_KEY
               # Destroy any partially created resources
           terraform init
           terraform destroy -auto-approve

@@ -1,0 +1,54 @@
+name: Terraform Workflow
+
+on:
+  push:
+    branches:
+      - dev   # Trigger workflow on push to the dev branch
+  pull_request:
+    branches:
+      - dev   # Trigger workflow on pull requests targeting the dev branch
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up AWS credentials
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Change to your AWS region
+
+      # Step 3: Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.4.5  # You can specify the version you need
+
+      # Step 4: Initialize Terraform with S3 backend
+      - name: Terraform Init
+        run: terraform init
+          # terraform init \
+          #   -backend-config="bucket=my-terraform-state" \
+          #   -backend-config="key=terraform.tfstate" \
+          #   -backend-config="region=us-west-2"  # Replace with your region
+
+      # Step 5: Run Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      # Step 6: Run Terraform Apply
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+        # env:
+        #   TF_VAR_some_variable: ${{ secrets.TF_VAR_some_variable }}  # If you use any sensitive variables
+
+      # # Optional: Clean up state file (if needed)
+      # - name: Clean up state
+      #   run: terraform state rm aws_instance.prod_instance  # Example of removing resources, adjust as needed

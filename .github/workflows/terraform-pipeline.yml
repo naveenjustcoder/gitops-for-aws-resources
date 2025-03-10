@@ -11,6 +11,9 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    env:
+      TF_ST_BKT: ${{ secrets.TF_STATE_BUCKET }}
+      TF_ST_KEY: ${{ secrets.TF_STATE_KEY }}
     
     steps:
       # Step 1: Checkout the repository
@@ -23,7 +26,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Change to your AWS region
+          aws-region: ${{ secrets.AWS_REGION }}  # Change to your AWS region
 
       # Step 3: Set up Terraform
       - name: Set up Terraform
@@ -33,22 +36,66 @@ jobs:
 
       # Step 4: Initialize Terraform with S3 backend
       - name: Terraform Init
-        run: terraform init
-          # terraform init \
-          #   -backend-config="bucket=my-terraform-state" \
-          #   -backend-config="key=terraform.tfstate" \
-          #   -backend-config="region=us-west-2"  # Replace with your region
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=${{ secrets.TF_STATE_KEY }}" \
+            -backend-config="region=${{ secrets.AWS_REGION }}"  # Replace with your region
+    
+      # Step 5: Check for existing Terraform state file
+      - name: Backup Terraform State
+        run: |
+          # Replace with your actual S3 bucket and file path
+          FILE_PATH="s3://my-terraform-state-bucket/terraform.tfstate"
 
-      # Step 5: Run Terraform Plan
+          # Check if the file exists
+          if aws s3api head-object --bucket my-terraform-state-bucket --key "path/terraform.tfstate" 2>/dev/null; then
+            echo "State file exists in S3"
+            echo "state_file_exists=true" >> $GITHUB_ENV
+          else
+            echo "State file does not exist in S3"
+            echo "state_file_exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Copy state file if it exists
+        if: env.state_file_exists == 'true'
+        run: |
+          echo "Copying state file from S3"
+          aws s3 cp s3://$TF_ST_BKT/$TF_ST_KEY terraform_backup_state_file
+        id: backup-state      
+
+      # Step 6: Run Terraform Plan
       - name: Terraform Plan
         run: terraform plan -out=tfplan
 
-      # Step 6: Run Terraform Apply
+      # Step 7: Run Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve tfplan || (echo "Apply failed, attempting rollback..." && exit 1)
+        id: apply
         # env:
         #   TF_VAR_some_variable: ${{ secrets.TF_VAR_some_variable }}  # If you use any sensitive variables
+      
+      # Step 8: (Optional) Rollback on Failure\
+      - name: (Optional) RollBack on Failure
+        if: steps.apply.outcome == 'failure'
+        run: |
+          echo "Rolling back changes..."
+              # Restore the previous state
+          aws s3 cp terraform_backup_state_file s3://$TF_ST_BKT/$TF_ST_KEY
+              # Destroy any partially created resources
+          terraform init
+          terraform destroy -auto-approve
+        id: rollback
 
-      # # Optional: Clean up state file (if needed)
-      # - name: Clean up state
-      #   run: terraform state rm aws_instance.prod_instance  # Example of removing resources, adjust as needed
+      - name: Notify Failure
+        if: steps.rollback.conclusion == 'failure'
+        run: |
+          echo "Rollback failed. Manual intervention required."
+          exit 1
+
+      - name: Notify Success
+        if: steps.apply.outcome == 'success'
+        run: echo "Terraform apply completed successfully."
+          # # Optional: Clean up state file (if needed)
+          # - name: Clean up state
+          #   run: terraform state rm aws_instance.prod_instance  # Example of removing resources, adjust as needed

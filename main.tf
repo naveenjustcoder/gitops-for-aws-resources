@@ -17,7 +17,7 @@ resource "aws_vpc" "prod_vpc" {
 resource "aws_subnet" "prod_subnet" {
   vpc_id                  = aws_vpc.prod_vpc.id
   cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-2a"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
   tags = {
     Name = "prod-subnet"

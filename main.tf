@@ -95,7 +95,7 @@ resource "aws_instance" "prod_instance" {
   instance_type   = "t2.micro"     # Adjust instance size as per your needs
   subnet_id       = aws_subnet.prod_subnet.id
   key_name        = aws_key_pair.prod_key.key_name
-  security_groups = [aws_security_group.prod_sg.name]
+#   security_groups = [aws_security_group.prod_sg.name]
 #   iam_instance_profile = aws_iam_role.ec2_role.name
 
   tags = {

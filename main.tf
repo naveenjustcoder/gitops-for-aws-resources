@@ -17,7 +17,7 @@ resource "aws_vpc" "prod_vpc" {
 resource "aws_subnet" "prod_subnet" {
   vpc_id                  = aws_vpc.prod_vpc.id
   cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-west-2a"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
   tags = {
     Name = "prod-subnet"
@@ -95,7 +95,7 @@ resource "aws_instance" "prod_instance" {
   instance_type   = "t2.micro"     # Adjust instance size as per your needs
   subnet_id       = aws_subnet.prod_subnet.id
   key_name        = aws_key_pair.prod_key.key_name
-  security_groups = [aws_security_group.prod_sg.name]
+#   security_groups = [aws_security_group.prod_sg.name]
 #   iam_instance_profile = aws_iam_role.ec2_role.name
 
   tags = {

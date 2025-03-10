@@ -85,7 +85,7 @@ resource "aws_security_group" "prod_sg" {
 # EC2 Key Pair for SSH access
 resource "aws_key_pair" "prod_key" {
   key_name   = "prod-key"
-  public_key = file("~/.ssh/id_ed25519.pub")  # Replace with your actual public key file path
+#   public_key = file("~/.ssh/id_ed25519.pub")  # Replace with your actual public key file path
 }
 
 # EC2 Instance Configuration

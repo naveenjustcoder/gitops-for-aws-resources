@@ -42,6 +42,9 @@ jobs:
       # Step 5: Backup current Terraform state
       - name: Backup Terraform State
         run: |
+          env:
+            TF_ST_BKT: ${{ secrets.TF_STATE_BUCKET }}
+            TF_ST_KY: ${{ secrets.TF_STATE_KEY }}
           aws s3 cp s3://${{ secrets.TF_STATE_BUCKET }}/${{ secrets.TF_STATE_KEY }} terraform.tfstate.backup
         id: backup-state      
 

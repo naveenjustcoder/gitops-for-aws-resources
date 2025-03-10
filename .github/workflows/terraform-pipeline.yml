@@ -56,7 +56,8 @@ jobs:
         # env:
         #   TF_VAR_some_variable: ${{ secrets.TF_VAR_some_variable }}  # If you use any sensitive variables
       
-      # Step 8: (Optional) Rollback on Failure
+      # Step 8: (Optional) Rollback on Failure\
+      - name: (Optional) RollBack on Failure
         if: steps.apply.outcome == 'failure'
         run: |
           echo "Rolling back changes..."

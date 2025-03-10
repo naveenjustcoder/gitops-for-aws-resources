@@ -85,13 +85,13 @@ resource "aws_security_group" "prod_sg" {
 # EC2 Key Pair for SSH access
 resource "aws_key_pair" "prod_key" {
   key_name   = "prod-key"
-  public_key = file("~/.ssh/id_rsa.pub")  # Replace with your actual public key file path
+  public_key = file("~/.ssh/id_ed25519.pub")  # Replace with your actual public key file path
 }
 
 # EC2 Instance Configuration
 resource "aws_instance" "prod_instance" {
-  ami             = "ami-12345678"  # Replace with the correct AMI ID for your region
-  instance_type   = "t3.medium"     # Adjust instance size as per your needs
+  ami             = "ami-0b0ea68c435eb488d"  # Replace with the correct AMI ID for your region
+  instance_type   = "t2.micro"     # Adjust instance size as per your needs
   subnet_id       = aws_subnet.prod_subnet.id
   key_name        = aws_key_pair.prod_key.key_name
   security_groups = [aws_security_group.prod_sg.name]

@@ -86,7 +86,7 @@ resource "aws_security_group" "prod_sg" {
 resource "aws_key_pair" "prod_key" {
   key_name   = "prod-key"
 #    public_key = file("~/.ssh/id_ed25519.pub")  # Replace with your actual public key file path
-   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/TCaHHn0FEH8LwcFDFB1auBt9dc5OFqfbF6dCsuey+ naveencomputerengineer@gmail.com"
+   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOdLh7/0PLrpISi88RbucxpATq+D8EB7rAsJVrUN86b9 ubuntu@naveen-MS-7C95"
 }
 
 # EC2 Instance Configuration

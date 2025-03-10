@@ -107,10 +107,8 @@ resource "aws_instance" "prod_instance" {
   # CloudWatch Logs configuration (optional but recommended for production)
   user_data = <<-EOT
               #!/bin/bash
-              yum update -y
-              yum install -y awslogs
-              service awslogs start
-              chkconfig awslogs on
+              sudo apt update && apt install -y awslogs
+              sudo systemctl enable --now awslogsd
               EOT
 }
 

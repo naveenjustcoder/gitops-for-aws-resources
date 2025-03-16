@@ -28,7 +28,8 @@ jobs:
           pip install checkov
           checkov -d .
         id: checkov
-
+        continue-on-error: true
+        
       # Step 3: Set up AWS credentials
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

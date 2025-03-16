@@ -6,7 +6,15 @@ provider aws{
 resource "aws_instance" "example" {
   ami           = "ami-0b0ea68c435eb488d"
   instance_type = "t2.micro"
+  monitoring = true
+  root_block_device {
+    encrypted = true  
+  }
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
   user_data = <<-EOF
               #!/bin/bash
 

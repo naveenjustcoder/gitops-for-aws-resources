@@ -7,8 +7,24 @@ resource "aws_key_pair" "deployer-key" {
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/TCaHHn0FEH8LwcFDFB1auBt9dc5OFqfbF6dCsuey+ naveencomputerengineer@gmail.com"
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
 resource "aws_instance" "example" {
-  ami                  = "ami-08b5b3a93ed654d19"
+  # ami                  = "ami-08b5b3a93ed654d19"
+  ami                  = data.aws_ami.ubuntu.id
   instance_type        = "t2.micro"
   iam_instance_profile = aws_iam_instance_profile.my_ec2_instance_profile.name
   monitoring           = true
@@ -21,12 +37,19 @@ resource "aws_instance" "example" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
+  # user_data = <<-EOF
+  #             #!/bin/bash
+  #             sudo yum update -y
+  #             sudo yum install -y httpd
+  #             sudo systemctl enable --now httpd
+  #             echo "Hello, World from $(hostname)" > /var/www/html/index.html
+  #             EOF
+
   user_data = <<-EOF
               #!/bin/bash
-
-              sudo yum update -y
-              sudo yum install -y httpd
-              sudo systemctl enable --now httpd
+              sudo apt update -y
+              sudo apt install -y apache2
+              sudo systemctl enable --now apache2
               echo "Hello, World from $(hostname)" > /var/www/html/index.html
               EOF
 }

@@ -28,6 +28,20 @@ resource "aws_s3_bucket" "com-div-proj-comp-s3-bucket" {
   bucket_prefix = "com.div.proj.comp"  # Bucket name must be globally unique
 }
 
+resource "aws_sns_topic" "com-div-proj-comp-sns-topic" {
+  name = "com.div.proj.comp.s3-bucket-notifications"
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.com-div-proj-comp-s3-bucket.id
+
+  topic {
+    topic_arn     = aws_sns_topic.com-div-proj-comp-sns-topic.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "logs/"
+  }
+}
+
 # # Optional: Create a bucket for logging
 # resource "aws_s3_bucket" "com.div.proj.comp.s3-LOG-BUCKET" {
 #   bucket = "my-log-bucket"  # Replace with a unique bucket name

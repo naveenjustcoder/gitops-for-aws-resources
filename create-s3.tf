@@ -30,6 +30,7 @@ resource "aws_s3_bucket" "com-div-proj-comp-s3-bucket" {
 
 resource "aws_sns_topic" "com-div-proj-comp-sns-topic" {
   name = "com.div.proj.comp.s3-bucket-notifications"
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {

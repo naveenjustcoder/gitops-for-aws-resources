@@ -8,7 +8,7 @@ resource "aws_key_pair" "deployer-key" {
 }
 
 resource "aws_instance" "example" {
-  ami                  = "ami-0b0ea68c435eb488d"
+  ami                  = "ami-08b5b3a93ed654d19"
   instance_type        = "t2.micro"
   iam_instance_profile = aws_iam_instance_profile.my_ec2_instance_profile.name
   monitoring           = true

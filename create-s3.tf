@@ -2,11 +2,6 @@ provider "aws" {
   region = "us-east-1"  # Choose your desired AWS region
 }
 
-# resource "aws_s3_bucket_acl" "com_div_proj_comp_s3_bucket-acl" {
-#   bucket = aws_s3_bucket.com.div.proj.comp.s3-bucket.id
-#   acl    = "private"
-# }
-
 resource "aws_s3_bucket" "com_div_proj_comp_s3_bucket" {
   bucket_prefix = "com.div.proj.comp"  # Bucket name must be globally unique
 }
@@ -79,7 +74,7 @@ resource "aws_s3_bucket_acl" "com-div-proj-comp-s3-LOG-BUCKET-acl" {
   acl    = "log-delivery-write"
 }
 
-resource "aws_s3_bucket_logging" "excom_div_proj_comp_s3_bucket_logging" {
+resource "aws_s3_bucket_logging" "com_div_proj_comp_s3_bucket_logging" {
   bucket = aws_s3_bucket.com_div_proj_comp_s3_bucket.id
   target_bucket = aws_s3_bucket.com_div_proj_comp_s3_LOG_BUCKET.id
   target_prefix = "logs/"

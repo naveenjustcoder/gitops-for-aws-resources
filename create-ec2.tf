@@ -27,7 +27,7 @@ resource "aws_instance" "example" {
               sudo yum update -y
               sudo yum install -y httpd
               sudo systemctl enable --now httpd
-              echo "Hello, World from $hostname" > /var/www/html/index.html
+              echo "Hello, World from $(hostname)" > /var/www/html/index.html
               EOF
 }
 
@@ -56,4 +56,8 @@ resource "aws_iam_role_policy_attachment" "my_role_policy_attachment" {
 resource "aws_iam_instance_profile" "my_ec2_instance_profile" {
   name = "my-ec2-instance-profile"
   role = aws_iam_role.my_ec2_role.name
+}
+
+data "aws_instance" "public_ip" {
+  public_ip = aws_instance.example.public_ip
 }

@@ -2,7 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_key_pair" "deployer-key" {
+resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP/TCaHHn0FEH8LwcFDFB1auBt9dc5OFqfbF6dCsuey+ naveencomputerengineer@gmail.com"
 }
@@ -13,10 +13,11 @@ resource "aws_instance" "example" {
   iam_instance_profile = aws_iam_instance_profile.my_ec2_instance_profile.name
   monitoring           = true
   ebs_optimized        = true
-  key_name             = "deployer-key"
+  key_name             = "naveen-keypair"
   root_block_device {
     encrypted = true
   }
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"

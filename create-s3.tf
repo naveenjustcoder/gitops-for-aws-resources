@@ -41,11 +41,21 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
       days = 90
     }
   }
+  rule {
+    id = "failed_uploads"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+    filter {}
+  }
 }
 resource "aws_s3_bucket_public_access_block" "com_div_proj_comp_s3_bucket_block_public_access" {
   bucket = aws_s3_bucket.com_div_proj_comp_s3_bucket.id
   block_public_acls   = true
   block_public_policy = true
+  restrict_public_buckets = true
+  ignore_public_acls=true
 }
 resource "aws_sns_topic" "com_div_proj_comp_sns_topic" {
   name = "com.div.proj.comp.s3-bucket-notifications"
@@ -62,7 +72,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 
 # Optional: Create a bucket for logging
 resource "aws_s3_bucket" "com_div_proj_comp_s3_LOG_BUCKET" {
-  bucket = "my-log-bucket"  # Replace with a unique bucket name
+  bucket = "com.div.proj.comp.s3-log-bucket"  # Replace with a unique bucket name
 }
 resource "aws_s3_bucket_acl" "com-div-proj-comp-s3-LOG-BUCKET-acl" {
   bucket = aws_s3_bucket.com_div_proj_comp_s3_bucket.id
@@ -72,9 +82,20 @@ resource "aws_s3_bucket_acl" "com-div-proj-comp-s3-LOG-BUCKET-acl" {
 resource "aws_s3_bucket_logging" "excom_div_proj_comp_s3_bucket_logging" {
   bucket = aws_s3_bucket.com_div_proj_comp_s3_bucket.id
   target_bucket = aws_s3_bucket.com_div_proj_comp_s3_LOG_BUCKET.id
-  target_prefix = "log/"
+  target_prefix = "logs/"
 }
-
+resource "aws_sns_topic" "com_div_proj_comp_log_bucket_sns_topic" {
+  name = "com.div.proj.comp.s3-log-bucket-notifications"
+  kms_master_key_id = "alias/aws/sns"
+}
+resource "aws_s3_bucket_notification" "log_bucket_notification" {
+  bucket = aws_s3_bucket.com.div.proj.comp.s3-log-bucket.id
+  topic {
+    topic_arn     = aws_sns_topic.com_div_proj_comp_log_bucket_sns_topic.arn
+    events        = ["s3:ObjectRemoved:*"]
+    filter_prefix = "logs/"
+  }
+}
 
 
 # Outputs for reference

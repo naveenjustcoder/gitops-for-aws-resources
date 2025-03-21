@@ -3,7 +3,7 @@ name: Terraform Workflow
 on:
   push:
     branches:
-      - dev   # Trigger workflow on push to the dev branch
+      - create-ec2   # Trigger workflow on push to the dev branch
   pull_request:
     branches:
       - dev   # Trigger workflow on pull requests targeting the dev branch

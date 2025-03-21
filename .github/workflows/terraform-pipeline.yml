@@ -39,7 +39,7 @@ jobs:
           pip install checkov
           checkov -d .
         id: checkov
-        continue-on-error: true
+      #  continue-on-error: true
 
       # Step 3: Set up AWS credentials
       - name: Set up AWS credentials
@@ -104,7 +104,7 @@ jobs:
           #   run: terraform state rm aws_instance.prod_instance  # Example of removing resources, adjust as needed
 
       # Step 10-F1: (Optional) Upload Terraform Backup state as artifact
-      - name: Upload Terraform State
+      - name: (Optional) Upload Terraform State
         if: steps.apply.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
@@ -126,7 +126,7 @@ jobs:
         id: rollback
 
       # Step 10-F2-F: Notify Failure
-      - name: Notify Failure
+      - name: (Optional) Notify Failure
         if: steps.rollback.conclusion == 'failure'
         run: |
           echo "Rollback failed. Manual intervention required."

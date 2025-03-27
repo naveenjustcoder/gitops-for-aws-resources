@@ -129,7 +129,7 @@ resource "aws_security_group" "public_sg" {
   }
 
   ingress {
-    cidr_blocks = ["var.admin_public_ip"]
+    cidr_blocks = [var.admin_public_ip]
     description = "Allow HTTP access from admin public IP"
     from_port   = 80
     to_port     = 80
